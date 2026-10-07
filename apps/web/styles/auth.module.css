@@ -1,0 +1,65 @@
+.frame {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8) var(--space-4);
+  background: var(--background);
+}
+
+.panel {
+  width: min(420px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.message {
+  width: 100%;
+  padding: var(--space-6);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.message h1 {
+  margin: 0 0 var(--space-3);
+  font-size: var(--type-title3-size);
+  line-height: var(--type-title3-line);
+  font-weight: var(--font-weight-regular);
+}
+
+.message p {
+  margin: 0 0 var(--space-4);
+  color: var(--text-secondary);
+  font-size: var(--type-body-small-size);
+  line-height: var(--type-body-small-line);
+}
+
+.message ul {
+  margin: 0;
+  padding-left: var(--space-5);
+  color: var(--text);
+  font-size: var(--type-caption-size);
+  line-height: var(--type-title3-line);
+}
+
+.message code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.92em;
+}
+
+.back {
+  color: var(--text-secondary);
+  font-size: var(--type-caption-size);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  min-height: var(--control-touch);
+  display: inline-flex;
+  align-items: center;
+}
+
+.back:hover {
+  color: var(--accent);
+}

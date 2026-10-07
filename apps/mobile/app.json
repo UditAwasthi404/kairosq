@@ -1,0 +1,80 @@
+{
+  "expo": {
+    "name": "kairos",
+    "slug": "kairos",
+    "scheme": "kairos",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/logo-light.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#121212",
+      "dark": {
+        "image": "./assets/logo-dark.png",
+        "backgroundColor": "#121212"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.kairos.mobile",
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Kairos records audio only when you start voice capture.",
+        "NSMotionUsageDescription": "Kairos uses motion to gently tilt onboarding."
+      },
+      "entitlements": {
+        "com.apple.security.application-groups": [
+          "group.com.kairos.mobile"
+        ]
+      }
+    },
+    "android": {
+      "package": "com.kairos.mobile",
+      "softwareKeyboardLayoutMode": "pan",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.POST_NOTIFICATIONS"
+      ],
+      "adaptiveIcon": {
+        "backgroundColor": "#121212",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "@clerk/expo",
+      "expo-dev-client",
+      "expo-secure-store",
+      "expo-router",
+      "expo-web-browser",
+      "expo-audio",
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "Kairos uses motion to gently tilt onboarding."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/android-icon-monochrome.png",
+          "color": "#D71921",
+          "defaultChannel": "kairos_updates"
+        }
+      ],
+      "./plugins/withKairosOs.js"
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "db67eb03-9650-4973-ab5a-38c3942255ae"
+      }
+    }
+  }
+}

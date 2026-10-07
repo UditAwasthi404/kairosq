@@ -1,0 +1,17 @@
+{
+  "name": "kairos",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "mobile": "npm run start --prefix apps/mobile",
+    "mobile:android": "npm run android --prefix apps/mobile",
+    "mobile:ios": "npm run ios --prefix apps/mobile",
+    "mobile:web": "npm run web --prefix apps/mobile",
+    "backend": "npm run start:dev --prefix backend",
+    "backend:test": "npm test --prefix backend",
+    "backend:lint": "npm run lint:check --prefix backend",
+    "backend:typecheck": "npm run typecheck --prefix backend",
+    "mobile:typecheck": "npm run typecheck --prefix apps/mobile"
+  }
+}

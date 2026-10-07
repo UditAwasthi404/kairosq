@@ -1,0 +1,16 @@
+{
+  "name": "kairos-recall",
+  "version": "1.0.0",
+  "description": "Kairos Recall — Android MediaProjection capture with on-device OCR and encrypted outbox",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {},
+  "keywords": ["react-native", "expo", "kairos", "recall"],
+  "author": "Kairos",
+  "license": "UNLICENSED",
+  "peerDependencies": {
+    "expo": "*",
+    "react": "*",
+    "react-native": "*"
+  }
+}

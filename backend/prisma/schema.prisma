@@ -1,0 +1,456 @@
+// Kairos — observation understanding vertical slice.
+// Full future model: docs/DATA_MODEL.md
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // Neon: use the non-pooled connection for migrations
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                String               @id @default(cuid())
+  clerkUserId       String               @unique
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  observations      Observation[]
+  topics            Topic[]
+  entities          Entity[]
+  projects          Project[]
+  conversations     Conversation[]
+  entitlements      Entitlement[]
+  recallEventReceipts RecallEventReceipt[]
+  deviceTokens      DeviceToken[]
+  progression       UserProgression?
+  progressionPeers  ProgressionPeer[] @relation("ProgressionPeerOwner")
+  progressionOf     ProgressionPeer[] @relation("ProgressionPeerTarget")
+
+  @@map("users")
+}
+
+enum ProgressionAction {
+  CAPTURE
+  ASK
+  RECALL
+  FREEZE
+}
+
+/// One row per user. Primary metric is xp → level (world strength).
+model UserProgression {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  xp                  Int      @default(0)
+  level               Int      @default(1)
+  keeps               Int      @default(0)
+  currentStreak       Int      @default(0)
+  longestStreak       Int      @default(0)
+  lastActiveDate      String?
+  freezeTokens        Int      @default(0)
+  equippedTitle       String?
+  equippedAura        String?
+  leaderboardVisible  Boolean  @default(false)
+  displayName         String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  events              ProgressionEvent[]
+  unlocks             ProgressionUnlock[]
+
+  @@index([leaderboardVisible, xp(sort: Desc)])
+  @@map("user_progression")
+}
+
+/// Idempotent award log. Unique per progression + action key so retries cannot double-credit.
+model ProgressionEvent {
+  id              String            @id @default(cuid())
+  progressionId   String
+  progression     UserProgression   @relation(fields: [progressionId], references: [id], onDelete: Cascade)
+  idempotencyKey  String
+  action          ProgressionAction
+  xpAwarded       Int
+  keepsAwarded    Int
+  multiplier      Int               @default(1)
+  bonus           Boolean           @default(false)
+  freezeUsed      Int               @default(0)
+  streakAfter     Int
+  createdAt       DateTime          @default(now())
+
+  @@unique([progressionId, idempotencyKey])
+  @@index([progressionId, createdAt])
+  @@map("progression_events")
+}
+
+model ProgressionUnlock {
+  id             String          @id @default(cuid())
+  progressionId  String
+  progression    UserProgression @relation(fields: [progressionId], references: [id], onDelete: Cascade)
+  key            String
+  kind           String
+  streakGated    Boolean         @default(true)
+  streakAtUnlock Int
+  unlockedAt     DateTime        @default(now())
+
+  @@unique([progressionId, key])
+  @@map("progression_unlocks")
+}
+
+model ProgressionPeer {
+  id         String   @id @default(cuid())
+  ownerId    String
+  owner      User     @relation("ProgressionPeerOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  peerId     String
+  peer       User     @relation("ProgressionPeerTarget", fields: [peerId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([ownerId, peerId])
+  @@index([ownerId])
+  @@map("progression_peers")
+}
+
+enum DevicePlatform {
+  ANDROID
+  IOS
+}
+
+/// Expo push token for a signed-in device. One row per token.
+model DeviceToken {
+  id         String         @id @default(cuid())
+  userId     String
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token      String         @unique
+  platform   DevicePlatform
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  lastSeenAt DateTime       @default(now())
+
+  @@index([userId])
+  @@map("device_tokens")
+}
+
+enum EntitlementFeature {
+  RECALL
+}
+
+enum EntitlementStatus {
+  inactive
+  trial
+  active
+  grace
+  expired
+  revoked
+}
+
+/// Provider-agnostic feature entitlement. Server is authoritative.
+model Entitlement {
+  id         String            @id @default(cuid())
+  userId     String
+  user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  feature    EntitlementFeature
+  status     EntitlementStatus @default(inactive)
+  validUntil DateTime?
+  /// Persisted Pro flag. Recall access still re-checks validUntil on read.
+  isPro      Boolean           @default(false)
+  /// app_store | play_store | stripe | promotional | test_store | amazon | unknown
+  store      String?
+  productId  String?
+  /// RevenueCat event time, or the subscriber-sync time. Older events are ignored.
+  lastEventAt DateTime?
+  /// revenuecat | stripe | admin | stub
+  source     String            @default("stub")
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  @@unique([userId, feature])
+  @@index([userId, feature, status])
+  @@map("entitlements")
+}
+
+/// Durable idempotency + soft fingerprint dedupe for Recall ingest.
+model RecallEventReceipt {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clientEventId String
+  fingerprint   String
+  observationId String?
+  createdAt     DateTime @default(now())
+
+  observation   Observation? @relation(fields: [observationId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, clientEventId])
+  @@index([userId, fingerprint, createdAt])
+  @@map("recall_event_receipts")
+}
+
+enum ObservationType {
+  DOCUMENT
+  PDF
+  IMAGE
+  TEXT
+  AUDIO
+}
+
+/// Origin of a memory. Every observation must have a source.
+enum CaptureSource {
+  MANUAL
+  KEYBOARD
+  SHARE
+  QUICK_CAPTURE
+  VOICE
+  WIDGET
+  RECALL
+}
+
+enum ProcessingStatus {
+  PENDING
+  PROCESSING
+  EXTRACTING
+  NORMALIZING
+  CHUNKING
+  ANALYZING
+  EMBEDDING
+  COMPLETED
+  FAILED
+}
+
+enum EntityType {
+  PERSON
+  ORGANIZATION
+  TECHNOLOGY
+  PRODUCT
+  LOCATION
+  CONCEPT
+}
+
+model Observation {
+  id               String                @id @default(cuid())
+  userId           String
+  user             User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clientCaptureId  String?
+  type             ObservationType
+  source           CaptureSource         @default(MANUAL)
+  originalFilename String
+  mimeType         String
+  storageKey       String
+  fileSizeBytes    Int
+  processingStatus ProcessingStatus      @default(PENDING)
+  extractedText    String?
+  summary          String?
+  processingError  String?
+  sourceMetadata   Json?
+  pageCount        Int?
+  characterCount   Int?
+  wordCount        Int?
+  chunkCount       Int?
+  capturedAt       DateTime              @default(now())
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  chunks              ObservationChunk[]
+  observationTopics   ObservationTopic[]
+  observationEntities ObservationEntity[]
+  projectObservations ProjectObservation[]
+  recallEventReceipts RecallEventReceipt[]
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, capturedAt(sort: Desc)])
+  @@index([userId, processingStatus])
+  @@index([userId, source])
+  @@unique([userId, clientCaptureId])
+  @@map("observations")
+}
+
+model ObservationChunk {
+  id             String                      @id @default(cuid())
+  observationId  String
+  observation    Observation                 @relation(fields: [observationId], references: [id], onDelete: Cascade)
+  content        String
+  chunkIndex     Int
+  startOffset    Int?
+  endOffset      Int?
+  /// pgvector column; written/queried via raw SQL. Dimension must match EMBEDDING_DIMENSIONS.
+  embedding      Unsupported("vector")?
+  embeddingModel String?
+  embeddedAt     DateTime?
+  createdAt      DateTime                    @default(now())
+
+  @@unique([observationId, chunkIndex])
+  @@index([observationId])
+  @@map("observation_chunks")
+}
+
+model Topic {
+  id                String             @id @default(cuid())
+  userId            String
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name              String
+  normalizedName    String
+  description       String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  observationTopics ObservationTopic[]
+
+  @@unique([userId, normalizedName])
+  @@index([userId])
+  @@map("topics")
+}
+
+model Entity {
+  id                  String              @id @default(cuid())
+  userId              String
+  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name                String
+  normalizedName      String
+  type                EntityType
+  metadata            Json?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  observationEntities ObservationEntity[]
+
+  @@unique([userId, normalizedName, type])
+  @@index([userId])
+  @@map("entities")
+}
+
+model ObservationTopic {
+  observationId String
+  topicId       String
+  confidence    Float?
+  createdAt     DateTime    @default(now())
+  observation   Observation @relation(fields: [observationId], references: [id], onDelete: Cascade)
+  topic         Topic       @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@id([observationId, topicId])
+  @@index([topicId])
+  @@map("observation_topics")
+}
+
+model ObservationEntity {
+  observationId String
+  entityId      String
+  confidence    Float?
+  createdAt     DateTime    @default(now())
+  observation   Observation @relation(fields: [observationId], references: [id], onDelete: Cascade)
+  entity        Entity      @relation(fields: [entityId], references: [id], onDelete: Cascade)
+
+  @@id([observationId, entityId])
+  @@index([entityId])
+  @@map("observation_entities")
+}
+
+/// User-managed collection. Membership is independent of extraction/reprocessing.
+model Project {
+  id                  String               @id @default(cuid())
+  userId              String
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name                String
+  description         String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  projectObservations ProjectObservation[]
+
+  @@index([userId, updatedAt(sort: Desc)])
+  @@map("projects")
+}
+
+model ProjectObservation {
+  projectId     String
+  observationId String
+  createdAt     DateTime    @default(now())
+  project       Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  observation   Observation @relation(fields: [observationId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, observationId])
+  @@index([observationId])
+  @@index([projectId, createdAt(sort: Desc)])
+  @@map("project_observations")
+}
+
+enum ConversationMessageRole {
+  USER
+  ASSISTANT
+}
+
+enum ConversationMessageStatus {
+  COMPLETED
+  FAILED
+}
+
+model Conversation {
+  id        String                @id @default(cuid())
+  userId    String
+  user      User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+  messages  ConversationMessage[]
+
+  @@index([userId, updatedAt(sort: Desc)])
+  @@map("conversations")
+}
+
+model ConversationMessage {
+  id                    String                     @id @default(cuid())
+  conversationId        String
+  conversation          Conversation               @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role                  ConversationMessageRole
+  content               String
+  status                ConversationMessageStatus  @default(COMPLETED)
+  /// Validated citations only: [{observationId, chunkId, title, snippet, createdAt}]
+  citations             Json?
+  insufficientEvidence  Boolean?
+  /// Client-supplied idempotency key for USER turns (unique per conversation when set).
+  clientRequestId       String?
+  createdAt             DateTime                   @default(now())
+
+  @@unique([conversationId, clientRequestId])
+  @@index([conversationId, createdAt])
+  @@map("conversation_messages")
+}
+
+enum ObservationJobKind {
+  PROCESS
+  REINDEX
+  NOTIFY
+}
+
+enum ObservationJobStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+  FAILED
+}
+
+/// Durable observation work. Survives process restarts (SKIP LOCKED worker).
+model ObservationJob {
+  id            String               @id @default(cuid())
+  observationId String
+  kind          ObservationJobKind
+  status        ObservationJobStatus @default(PENDING)
+  payload       Json?
+  attempts      Int                  @default(0)
+  maxAttempts   Int                  @default(5)
+  availableAt   DateTime             @default(now())
+  lockedAt      DateTime?
+  lockToken     String?
+  lastError     String?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
+  @@index([status, availableAt])
+  @@index([observationId, kind, status])
+  @@map("observation_jobs")
+}
+
+/// Distributed sliding-window hits (Recall and other HTTP limits).
+model RateLimitEvent {
+  id        String   @id @default(cuid())
+  bucketKey String
+  createdAt DateTime @default(now())
+
+  @@index([bucketKey, createdAt])
+  @@map("rate_limit_events")
+}

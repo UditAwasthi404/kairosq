@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/kairos_actions_root"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:gravity="center_vertical"
+  android:orientation="horizontal"
+  android:paddingStart="12dp"
+  android:paddingEnd="12dp"
+  android:background="@drawable/kairos_widget_bg">
+
+  <TextView
+    android:id="@+id/kairos_action_capture"
+    android:layout_width="0dp"
+    android:layout_height="40dp"
+    android:layout_weight="1"
+    android:background="@drawable/kairos_widget_btn_ask"
+    android:gravity="center"
+    android:text="Capture"
+    android:textColor="#FFFFFF"
+    android:textSize="13sp" />
+
+  <TextView
+    android:id="@+id/kairos_action_voice"
+    android:layout_width="0dp"
+    android:layout_height="40dp"
+    android:layout_marginStart="8dp"
+    android:layout_weight="1"
+    android:background="@drawable/kairos_widget_btn"
+    android:gravity="center"
+    android:text="Voice"
+    android:textColor="#F0F0F0"
+    android:textSize="13sp" />
+
+  <TextView
+    android:id="@+id/kairos_action_ask"
+    android:layout_width="0dp"
+    android:layout_height="40dp"
+    android:layout_marginStart="8dp"
+    android:layout_weight="1"
+    android:background="@drawable/kairos_widget_btn"
+    android:gravity="center"
+    android:text="Ask"
+    android:textColor="#F0F0F0"
+    android:textSize="13sp" />
+
+  <TextView
+    android:id="@+id/kairos_action_brief"
+    android:layout_width="0dp"
+    android:layout_height="40dp"
+    android:layout_marginStart="8dp"
+    android:layout_weight="1"
+    android:background="@drawable/kairos_widget_btn"
+    android:gravity="center"
+    android:text="Brief"
+    android:textColor="#F0F0F0"
+    android:textSize="13sp" />
+</LinearLayout>

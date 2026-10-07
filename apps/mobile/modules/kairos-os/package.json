@@ -1,0 +1,16 @@
+{
+  "name": "kairos-os",
+  "version": "1.0.0",
+  "description": "Kairos OS integrations — share target, home-screen widget, and keyboard",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {},
+  "keywords": ["react-native", "expo", "kairos", "share", "widget", "keyboard"],
+  "author": "Kairos",
+  "license": "UNLICENSED",
+  "peerDependencies": {
+    "expo": "*",
+    "react": "*",
+    "react-native": "*"
+  }
+}

@@ -1,0 +1,161 @@
+/* Derived from apps/mobile/theme.ts. Light elevated surface matches surface (#FFFFFF). */
+
+:root {
+  color-scheme: light;
+
+  --background: #f5f5f5;
+  --surface: #ffffff;
+  --surface-elevated: #ffffff;
+  --surface-container: #eeeeee;
+  --surface-container-high: #e0e0e0;
+
+  --text: #000000;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --text-disabled: #bbbbbb;
+  --inverse-text: #ffffff;
+
+  --accent: #d71921;
+  --accent-pressed: #b01219;
+  --primary-soft: #fff1f2;
+  --on-accent: #ffffff;
+
+  --border: #e0e0e0;
+  --border-subtle: #eeeeee;
+  --border-active: #d71921;
+  --divider: #e0e0e0;
+
+  --success: #2f7a3a;
+  --success-surface: #f3f8f4;
+  --warning: #8a6a1e;
+  --error: #d71921;
+  --error-surface: #fff1f2;
+
+  --button-fill: #000000;
+  --button-text: #ffffff;
+  --button-pressed: #1a1a1a;
+  --button-disabled: #e0e0e0;
+  --button-disabled-text: #999999;
+
+  --input-fill: #ffffff;
+  --input-border: #cccccc;
+  --input-border-focused: #d71921;
+  --input-placeholder: #999999;
+
+  --overlay: rgba(0, 0, 0, 0.04);
+  --scrim: rgba(0, 0, 0, 0.45);
+
+  --space-0: 0px;
+  --space-0-5: 2px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  --radius-none: 0px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+  --radius-2xl: 36px;
+  --radius-full: 999px;
+
+  --type-hero-size: 40px;
+  --type-hero-line: 48px;
+  --type-display-size: 34px;
+  --type-display-line: 42px;
+  --type-title1-size: 26px;
+  --type-title1-line: 34px;
+  --type-title2-size: 22px;
+  --type-title2-line: 30px;
+  --type-title3-size: 18px;
+  --type-title3-line: 26px;
+  --type-body-size: 17px;
+  --type-body-line: 26px;
+  --type-body-small-size: 15px;
+  --type-body-small-line: 22px;
+  --type-caption-size: 14px;
+  --type-caption-line: 20px;
+  --type-overline-size: 12px;
+  --type-overline-line: 16px;
+  --type-button-size: 16px;
+  --type-button-line: 22px;
+  --type-stat-size: 40px;
+  --type-stat-line: 48px;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --tracking-overline: 0.4px;
+
+  --motion-instant: 80ms;
+  --motion-fast: 140ms;
+  --motion-normal: 280ms;
+  --motion-smooth: 320ms;
+  --motion-expressive: 340ms;
+  --motion-page: 300ms;
+  --ease-out: cubic-bezier(0.33, 1, 0.68, 1);
+
+  --control-touch: 44px;
+  --control-icon: 40px;
+  --control-dock: 64px;
+  --sidebar-rail: 76px;
+  --sidebar-width: 248px;
+  --content-max: 960px;
+  --shadow: none;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --background: #121212;
+  --surface: #1c1c1c;
+  --surface-elevated: #222222;
+  --surface-container: #222222;
+  --surface-container-high: #2a2a2a;
+
+  --text: #f0f0f0;
+  --text-secondary: #b5b5b5;
+  --text-muted: #8a8a8a;
+  --text-disabled: #666666;
+  --inverse-text: #121212;
+
+  --accent: #d71921;
+  --accent-pressed: #b01219;
+  --primary-soft: rgba(215, 25, 33, 0.16);
+  --on-accent: #ffffff;
+
+  --border: #333333;
+  --border-subtle: #2a2a2a;
+  --border-active: #d71921;
+  --divider: #2c2c2c;
+
+  --success: #6aaa72;
+  --success-surface: #16211a;
+  --warning: #c4a15a;
+  --error: #d71921;
+  --error-surface: #3a1214;
+
+  --button-fill: #d71921;
+  --button-text: #ffffff;
+  --button-pressed: #b01219;
+  --button-disabled: #2a2a2a;
+  --button-disabled-text: #8a8a8a;
+
+  --input-fill: #1a1a1a;
+  --input-border: #333333;
+  --input-border-focused: #d71921;
+  --input-placeholder: #7a7a7a;
+
+  --overlay: rgba(255, 255, 255, 0.04);
+  --scrim: rgba(18, 18, 18, 0.72);
+}

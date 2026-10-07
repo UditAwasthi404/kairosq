@@ -1,0 +1,63 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# dependencies
+brag-output/
+node_modules/
+docs/
+!docs/
+docs/*
+!docs/REVENUECAT_SUBSCRIPTIONS.md
+!docs/SHIPATON_NEXT_GEN.md
+!docs/shipaton-assets/
+!docs/shipaton-assets/**
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+# Local release artifacts — never commit APKs or AABs
+output/
+*.apk
+*.aab
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env
+.env*.local
+!.env.example
+
+# typescript
+*.tsbuildinfo
+
+# generated native folders (Expo prebuild)
+**/ios
+**/android
+# Keep local Expo module native sources tracked
+!apps/mobile/modules/**/android/
+!apps/mobile/modules/**/android/**
+!apps/mobile/modules/**/ios/
+!apps/mobile/modules/**/ios/**
+!apps/mobile/modules/**/ios-extensions/
+!apps/mobile/modules/**/ios-extensions/**
+# Still ignore module build outputs
+apps/mobile/modules/**/android/build/
+apps/mobile/modules/**/android/.gradle/

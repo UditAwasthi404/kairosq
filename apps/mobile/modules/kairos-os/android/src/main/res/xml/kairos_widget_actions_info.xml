@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+  android:minWidth="250dp"
+  android:minHeight="48dp"
+  android:minResizeWidth="180dp"
+  android:minResizeHeight="48dp"
+  android:updatePeriodMillis="0"
+  android:initialLayout="@layout/kairos_widget_actions"
+  android:previewLayout="@layout/kairos_widget_actions"
+  android:resizeMode="horizontal|vertical"
+  android:widgetCategory="home_screen"
+  android:targetCellWidth="4"
+  android:targetCellHeight="1"
+  android:description="@string/kairos_widget_actions_description" />

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="kairos_widget_description">Today’s line from Kairos, with Capture and Ask.</string>
+  <string name="kairos_widget_capture_description">Save a thought or a voice note.</string>
+  <string name="kairos_widget_ask_description">Ask Kairos about what you have saved.</string>
+  <string name="kairos_widget_actions_description">Capture, voice, ask, and today’s brief.</string>
+  <string name="kairos_ime_label">Kairos Keyboard</string>
+  <string name="kairos_ime_settings">Kairos Keyboard never sends keystrokes unless you tap Save.</string>
+</resources>

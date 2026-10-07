@@ -1,0 +1,3 @@
+# Ensures Railway/Nixpacks uses Node 20+ (required by pdf-parse@2).
+[variables]
+NIXPACKS_NODE_VERSION = "20"

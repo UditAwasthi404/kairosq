@@ -1,0 +1,39 @@
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--control-touch);
+  color: var(--text);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+}
+
+.brand:hover {
+  background: var(--overlay);
+}
+
+.mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.markOnDark {
+  display: none;
+}
+
+:global([data-theme='dark']) .markOnLight {
+  display: none;
+}
+
+:global([data-theme='dark']) .markOnDark {
+  display: block;
+}
+
+.word {
+  font-size: var(--type-title3-size);
+  line-height: var(--type-title3-line);
+  font-weight: var(--font-weight-regular);
+}
